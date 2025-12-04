@@ -1,0 +1,27 @@
+# Virtual environment
+fastapi-venv/
+venv/
+.env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# VSCode settings
+.vscode/
+
+# Environment files
+*.env
+.env.*
+
+# Python dependency files
+*.sqlite3
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info
+
+
+fastapi-practice.db
+*.db
