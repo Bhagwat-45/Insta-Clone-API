@@ -23,3 +23,15 @@ def get_posts(db:Session):
     if not posts:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,description="No posts are found!!")
     return posts
+
+def delete_posts(db:Session,id:int,user_id: int):
+    posts = db.query(DbPost).filter(DbPost.id == id and DbPost.user_id == user_id).first()
+    if not posts:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"The Posts with id: {id} and user_id : {user_id} was not found!")
+    if posts.user_id != user_id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail='Only post creator can delete post')
+    db.delete(posts)
+    db.commit()
+    return "Okay"

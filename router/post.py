@@ -1,7 +1,8 @@
 from fastapi import APIRouter,status,Depends,HTTPException,File,UploadFile
-from .schemas import PostBase,PostDisplay
+from .schemas import PostBase,PostDisplay,UserAuth
 from sqlalchemy.orm import Session
 from db.database import get_db
+from auth.oauth2 import get_current_user
 from db import db_post
 import random
 import string
@@ -15,7 +16,7 @@ router = APIRouter(
 image_url_types = ['absolute','relative']
 
 @router.post("",status_code=status.HTTP_201_CREATED,response_model=PostDisplay)
-def create_post(request: PostBase,db:Session = Depends(get_db)):
+def create_post(request: PostBase,db:Session = Depends(get_db),current_user: UserAuth = Depends(get_current_user)):
     if not request.image_url_type in image_url_types:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,description="Not a relative or absolute image")
     post = db_post.create_post(request=request,db=db)
@@ -29,7 +30,7 @@ def get_post(db:Session = Depends(get_db)):
     return post
 
 @router.post("/image")
-def upload_image(image:UploadFile = File(...)):
+def upload_image(image:UploadFile = File(...),current_user: UserAuth = Depends(get_current_user)):
     letters = string.ascii_letters
     rand_str = "".join(random.choice(letters) for i in range(6))
     new = f'_{rand_str}.'
@@ -40,3 +41,7 @@ def upload_image(image:UploadFile = File(...)):
         shutil.copyfileobj(image.file,buffer)
 
     return {'filename' : path}
+
+@router.delete("/delete/{id}")
+def delete(id: int,db: Session= Depends(get_db),current_user: UserAuth = Depends(get_current_user)):
+    return db_post.delete_posts(db,id,current_user.id)
