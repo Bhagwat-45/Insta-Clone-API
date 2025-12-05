@@ -4,6 +4,7 @@ from db.database import engine
 from router import user,post
 from fastapi.staticfiles import StaticFiles
 from auth import authentication
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="Instagram API"
@@ -18,6 +19,18 @@ def root():
     return {
         "message" : "Hello World!!"
     }
+
+origins = [
+    'http://localhost:3000'
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins = origins,
+    allow_credentials = True,
+    allow_methods = ["*"],
+    allow_headers = ["*"]
+)
 
 models.Base.metadata.create_all(engine)
 
