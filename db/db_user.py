@@ -21,3 +21,12 @@ def get_user(db:Session):
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="There are no user's present!!")
     return user
+
+def get_user_by_username(db:Session,username: str):
+    user = db.query(DbUser).filter(DbUser.username == username).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"The User with username: {username} was not found!")
+    return user
+
+    
